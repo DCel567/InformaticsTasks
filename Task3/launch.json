@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "E:\\Desktop\\Desktop\\Стафф\\фулики\\учеба\\2 курс\\1 семестр\\Информатика\\Task3\\packet\\program.java"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-program",
+            "request": "launch",
+            "mainClass": "program"
+        }
+    ]
+}
