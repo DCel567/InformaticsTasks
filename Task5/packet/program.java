@@ -1,5 +1,6 @@
 package packet;
 
+import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +14,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -60,9 +60,9 @@ public class program {
             }
         } 
 
+        System.out.println();
 
         // Here is task about sportsmen
-
         try{
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser parser = factory.newSAXParser();
@@ -71,20 +71,25 @@ public class program {
             parser.parse(new File("Sportsmen.xml"), handler);
 
             for (Sportsman sp : sportsmans) {
-                System.out.println(sp.getName() + ": " + sp.getEventsCount());
+                System.out.println(sp.toString() + ": ");
+                for (int i = 0; i < sp.getEventsCount(); i++)
+                    System.out.println(i+1 + ". " + sp.returnEvent(i));
             }
 
         }
         catch(Exception e){
             System.out.println(e.getMessage());
         }
+
+        writeToJson();
     }
 
     private static class XMLHandler extends DefaultHandler {
 
-        private String lastElementName;
-        String place = "", year = "", award = "";
+        String place = null, year = null, award = null;
         int result = 0;
+        boolean bAward = false, bResult = false;
+        StringBuffer data = null;
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -94,44 +99,78 @@ public class program {
                 String birthday = attributes.getValue("birthday");
                 char gender = attributes.getValue("s").charAt(0);
 
-                sportsmans.add(new Sportsman(name, birthday, gender));               
-            }
+                sportsmans.add(new Sportsman(name, birthday, gender));  
 
-            lastElementName = qName;
-            System.out.println(lastElementName);
+            } else if (qName.equals("event")) {
+
+                place = attributes.getValue("place");
+                year = attributes.getValue("year");
+
+            } else if (qName.equals("result")) {
+                bResult = true;
+            } else if (qName.equals("award")) {
+                bAward = true;
+            }            
+
+            data = new StringBuffer();
         }
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            if ( (place != null && !place.isEmpty()) && (year != null && !year.isEmpty()) &&
-                 (award != null && !award.isEmpty()) && (result != 0) ) {
+            if (bResult) {
+                result = Integer.parseInt(data.toString());
+                bResult = false;
+            } else if (bAward){
+                award = data.toString();
+                bAward = false;
+            } else if (qName.equals("event")){
                 sportsmans.get(sportsmans.size()-1).addEvent(place, year, result, award);
-                place = null;
-                year = null;
-                award = null;
-                result = 0;
             }
-
-            // наладить, не сделано!
         }
 
         @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
-            String information = new String(ch, start, length);
+	    public void characters(char ch[], int start, int length) throws SAXException {
+		    data.append(new String(ch, start, length));
+	    }
+    }
 
-            information = information.replace("\n", "").trim();
+    static public void writeToJson() throws IOException {
+        FileWriter writer = new FileWriter("Sportsmen.json");
+        writer.append("{\n");
+        writer.append("\t\"team\": [\n");
 
-            if (!information.isEmpty()) {
-                if (lastElementName.equals("place"))
-                    place = information;
-                    //System.out.println(place);
-                if (lastElementName.equals("year"))
-                    year = information;
-                if (lastElementName.equals("result"))
-                    result = Integer.parseInt(information);
-                if (lastElementName.equals("award"))
-                    award = information;
+        for(int i = 0; i < sportsmans.size(); i++){
+            writer.append("\t\t{\n");
+            {
+                writer.append("\t\t\t\"name\": \"" + sportsmans.get(i).getName() + "\",\n");
+                writer.append("\t\t\t\"birthday\": \"" + sportsmans.get(i).getBirthday() + "\",\n");
+                writer.append("\t\t\t\"gender\": \"" + sportsmans.get(i).getGender() + "\",\n");
+                writer.append("\t\t\t\"events\": [\n");
+
+                for(int j = 0; j < sportsmans.get(i).getEventsCount(); j++){
+                    writer.append("\t\t\t\t{\n");
+                    writer.append("\t\t\t\t\t\"place\": \"" + sportsmans.get(i).returnEventPlace(j) + "\",\n");
+                    writer.append("\t\t\t\t\t\"year\": \"" + sportsmans.get(i).returnEventYear(j) + "\",\n");
+                    writer.append("\t\t\t\t\t\"result\": \"" + sportsmans.get(i).returnEventResult(j) + "\",\n");
+                    writer.append("\t\t\t\t\t\"award\": \"" + sportsmans.get(i).returnEventAward(j) + "\"\n");
+                    if (j == sportsmans.get(i).getEventsCount()-1){
+                        writer.append("\t\t\t\t}\n");
+                    } else {
+                        writer.append("\t\t\t\t},\n");
+                    }
+                }
+
+                writer.append("\t\t\t]\n");
+            }
+            if (i == sportsmans.size()-1){
+                writer.append("\t\t}\n");
+            } else {
+                writer.append("\t\t},\n");
             }
         }
+
+        writer.append("\t]\n");
+        writer.append("}");
+        writer.close();
     }
 }

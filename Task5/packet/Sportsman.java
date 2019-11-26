@@ -51,4 +51,9 @@ public class Sportsman {
     public String returnEvent(int i){
         return new String(events.get(i).getPlace() + " " + events.get(i).getYear() + " " + events.get(i).getResult() + " " + events.get(i).getAward());
     }
+
+    @Override
+    public String toString(){
+        return (name + " " + birthday);
+    }
 }
