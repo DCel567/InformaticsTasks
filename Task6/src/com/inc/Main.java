@@ -19,24 +19,24 @@ public class Main {
 
         System.out.println("Input contact you want to add to base. Name: ");
         name = scan.nextLine();
-		System.out.println("Country: ");
-		country = scan.nextLine();
-		System.out.println("City: ");
-		city = scan.nextLine();
-		System.out.println("Address: ");
-		address = scan.nextLine();
-		System.out.println("Telephone: ");
-		telephone = scan.nextLine();
-		System.out.println("Email: ");
-		email = scan.nextLine();
+	System.out.println("Country: ");
+	country = scan.nextLine();
+	System.out.println("City: ");
+	city = scan.nextLine();
+	System.out.println("Address: ");
+	address = scan.nextLine();
+	System.out.println("Telephone: ");
+	telephone = scan.nextLine();
+	System.out.println("Email: ");
+	email = scan.nextLine();
 
-		dbHandler.insert_data(name, country, city, address, telephone, email);
-		scan.close();
+	dbHandler.insert_data(name, country, city, address, telephone, email);
+	scan.close();
 
-		String contact_name = "Институт ядерных технологий", contact_telephone = "511-11-11";
-		dbHandler.change_contact_name_telephone(contact_name, contact_telephone);
+	String contact_name = "Институт ядерных технологий", contact_telephone = "511-11-11";
+	dbHandler.change_contact_name_telephone(contact_name, contact_telephone);
 
-		String contact_id = "5";
-		dbHandler.delete_by_id(contact_id);
+	String contact_id = "5";
+	dbHandler.delete_by_id(contact_id);
     }
 }
